@@ -1,0 +1,77 @@
+1.Countrywise goods exported to india???
+
+	query: mysql> select country_exporting_to_india, principal_commodity from myimpexp group by country_exporting_to_india
+			-> into outfile '/tmp/countrywise goods Exported to india.csv'
+			-> fields terminated by ',' enclosed by '"'
+			-> lines terminated by '\n';
+			
+	Output File : countrywise goods exported to india.csv
+	
+	observation:
+	
+2.total quantity of same good from different countries??
+
+	Query: mysql> select country_exporting_to_india, principal_commodity, sum(quantity_2011_12), sum(quantity_2012_13) from myimpexp group by Principal_commodity
+			-> into outfile '/tmp/quantity of goods from different country.csv'
+			-> fields terminated by ',' enclosed by '"'
+			-> lines terminated by '\n';
+			
+	Output file : Quantity of goods from different countries.csv 
+	
+	observation : quantity of most principal commodity are not defined
+					Most of the trade is done between algeria, australia, and afghanistan in terms of quantity.
+
+3.	Unknown countries exporting to india ?? 
+	
+	Query: mysql> select * from myimpexp
+				-> where country_exporting_to_india = 'unspecified'
+				-> into outfile '/tmp/Unspecified Country exporting to india.csv'
+				-> fields terminated by ',' enclosed by '"'
+				-> lines terminated by '\n';
+				
+	Output file : Unspecified Country exporting to india.csv
+	
+	Observation : There are unspecified countries exporting to india, 
+					this can be used for convertion of black money to white money by not specifying the countries which are exporting
+					keeping name of the country unspecified only for iron steel, gold etc. are not confidential.
+					
+4.average price of exported commodity??
+
+	query: mysql> select principal_commodity, avg(quantity_2011_12),avg(value_2011_12), avg(quantity_2012_13), avg(quantity_2012_13) from myimpexp
+			-> group by Principal_commodity
+			-> into outfile '/tmp/avg price of commodity year wise.csv'
+			-> fields terminated by ',' enclosed by '"'
+			-> lines terminated by '\n';
+			
+	Output file : avg price of commodity year wise.csv
+	
+	Observation : according to the results avg price of year on year has increased except 'fertilizers,crude' 'inorganic chemicals' 'jute,raw'
+				the fall in export can be due to less production of respective commodities.
+
+5. Max commodity imported to which country??
+	
+	query : mysql> select principal_commodity, country_exporting_to_india from myimpexp
+				-> where country_exporting_to_india = (select max(country_exporting_to_india) from myimpexp)
+				 -> into outfile '/tmp/max commodity imported to country.csv'
+				 -> fields terminated by ',' enclosed by '"'
+				-> lines terminated by '\n';
+				
+	Output File : max commodity imported to country.csv
+	
+	Observation : Zimbabwe has imported maximum no of commodities but year on year sales has been decreased
+					except 'iron and steel'(which is not imported in 2011_12) has shown a rise else were not imported.
+					
+6. 	Average Quantity and value comparision year on year ??
+
+	Query: mysql> select avg(quantity_2011_12), avg(value_2011_12), avg(quantity_2012_13),avg(value_2012_13) from myimpexp
+				-> into outfile '/tmp/avg sales year on year.csv'
+				-> fields terminated by ',' enclosed by '"'
+				-> lines terminated by '\n';
+				
+	Output File: avg sales year on year.csv
+	
+	Observation: avg quantity from 2011_12 AND 2012_13 has been decreased but the avg value generated from 2011_12 and 2012_13 has shown a rise
+				Reason can be steep increase in value of dollar
+				high demand and low production can cause rise in price of commodities
+				increase in export/import duties.
+

@@ -1,0 +1,2 @@
+select Country_exporting_to_India,Principal_Commodity,Quantity_2011_12,Quantity_2012_13
+from analysis;
