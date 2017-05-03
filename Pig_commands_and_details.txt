@@ -1,0 +1,41 @@
+hdfs dfs -put /opt/datafile_exp.csv /test
+
+exp = load '/test/datafile_exp.csv' using CSVLoader(',') AS (principle:chararray,country:chararray,unit:chararray,quantity_11:int,value_11:long,quantity_12:int,value_12:long);
+
+dump exp;
+
+groupbycommodity = group exp by principle;   //grouping of data
+
+counts = foreach groupbycommodity generate exp.principle,SUM(exp.value_11) as commodity_11,SUM(exp.value_12) as commodity_12;  //shows principle commodity mutiple times.
+
+counts = foreach groupbycommodity generate group as principle,SUM(exp.value_11) as commodity_11,SUM(exp.value_12) as commodity_12;
+ //shows principle commodity single time.( 
+Example:-
+age_counts = FOREACH by_age GENERATE
+  group as age,  -- the key you grouped on
+ COUNT(my_data), -- the number of people with this age
+ MAX(my_data.height); -- the maximum height of people with this age
+)
+
+store counts into '/test/output' using PigStorage (',');   //Stored into a data file
+
+hdfs dfs -get /test/output/part-r-00000 /opt     //getting back from hdfs storage
+
+groupbycountry = group exp by country; //grouping of country
+
+sub = foreach groupbycountry generate group as country,COUNT(exp.principle) as commodity_per_country; //counting commodity per country
+
+ordercommoditycount = order sub by commodity_per_country ASC; //ordering count of commodity per country
+
+show= limit ordercommoditycount 20; //limiting the relation ordrercommoditycount
+
+store show into '/test/output/top_20' using PigStorage (',');   //Stored into a data file
+
+
+//////for csv dumping in pig
+DEFINE CSVLoader org.apache.pig.piggybank.storage.CSVLoader();
+a = load 'data' USING CSVLoader(',') AS (field1:chararray,field2:chararray);
+ 
+b = FOREACH a GENERATE field1, field2;
+ 
+DUMP b;
